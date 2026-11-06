@@ -1,16 +1,34 @@
+/*
+ * Treap - tree + heap
+ *
+ * I used a treap in the latest version of `vic`. In this short scratch file
+ * we explore the concept of a treap; that is, how to create, add and remove
+ * nodes while keeping their invariant conditions.
+ *
+ * What's the idea behind treaps? A traditional binary search tree may
+ * degenerate into a linked list. In other words, if a binary search tree is
+ * not balanced, the advantage of using it (i.e. O(log n) operations) is lost.
+ * Treaps fix that by adding an additional parameter to the node, called
+ * 'priority'. This parameter is used to enforce a max-heap condition; that is,
+ * the priority of the parent node must be larger than the priority of its
+ * child nodes. The particularity of this parameter is that it is randomly
+ * assigned at the moment the node is created, so the shape of the tree does
+ * not depend on the order in which the keys are inserted.
+ *
+ * Two parameters per node mean two invariant conditions to keep at the same
+ * time: the binary search tree condition on the key, and the max-heap
+ * condition on the priority. There are two equivalent ways of keeping both.
+ * The classic one inserts the node as a leaf, traversing the tree with the
+ * binary search tree rule, and then rotates the node upwards while its
+ * priority is larger than the priority of its parent; the rotations stop when
+ * the parent has a larger priority, or when the new node reaches the root.
+ * Note that a rotation preserves the binary search tree condition, so only
+ * the heap condition has to be repaired. The other way, the one used in this
+ * file, builds every operation out of two primitives, split and merge.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-/*
- * A treap is a binary search tree on `key` that is simultaneously a
- * max-heap on `prior`.  The BST property fixes the left-to-right order
- * of the nodes; the heap property on random priorities fixes the shape,
- * so the shape is independent of the insertion order and the expected
- * height is O(log n).
- *
- * Every operation below is built out of two primitives, split and merge.
- */
 
 struct node {
 	struct node *l, *r;
